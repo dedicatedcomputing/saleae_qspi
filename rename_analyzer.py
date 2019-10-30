@@ -1,5 +1,6 @@
 import os
 import glob
+import sys
 
 # Fix Python 2.x.
 try:
@@ -30,12 +31,29 @@ print("")
 
 new_analyzer_title = input( "Your new analyzer's title: " )
 
+original_name = "SimpleSerial"
+
+
+vs_project_path = "Visual Studio"
+os.chdir( vs_project_path )
+
+project_files = glob.glob("*.sln") + glob.glob("*.vcxproj") #returns only the file names, no paths.
+
+for file in project_files:
+	contents = open( file, 'r' ).read()
+	contents = contents.replace( original_name + "Analyzer", new_analyzer_name + "Analyzer" )
+	contents = contents.replace( original_name.upper() + "ANALYZER", new_analyzer_name.upper() + "ANALYZER" )
+	contents = contents.replace( original_name + "SimulationDataGenerator", new_analyzer_name + "SimulationDataGenerator" )
+	open( file, 'w' ).write( contents )
+
+os.rename( glob.glob("*.sln")[0], new_analyzer_name + "Analyzer.sln" )
+os.rename( glob.glob("*.vcxproj")[0], new_analyzer_name + "Analyzer.vcxproj" )
+
 source_path = "source"
+os.chdir( ".." )
 os.chdir( source_path )
 
 files = dict()
-
-original_name = "SimpleSerial"
 
 cpp_files = glob.glob( "*.cpp" );
 h_files = glob.glob( "*.h" );
@@ -63,4 +81,3 @@ for file in new_files:
 	contents = contents.replace( original_name + "SimulationDataGenerator", new_analyzer_name + "SimulationDataGenerator" )
 	contents = contents.replace( "Simple Serial", new_analyzer_title )
 	open( file, 'w' ).write( contents )
-        
